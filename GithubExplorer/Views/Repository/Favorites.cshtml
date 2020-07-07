@@ -1,7 +1,9 @@
-﻿
-@{ 
+﻿@model List<GithubExplorer.Models.Repository>
+
+@{
     ViewBag.Title = "Favorites";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <h2>My Favorites</h2>
 
+@{Html.RenderPartial("Gallery", Model); }

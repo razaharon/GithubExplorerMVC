@@ -12,22 +12,37 @@ namespace GithubExplorer.Controllers
 {
     public class RepositoryController : Controller
     {
-        // GET: Repository
+
         public async Task<ActionResult> Index(string query)
         {
             List<Repository> result = await GithubAPI.GetRepositories(query);
             return View(result);
         }
 
-        public ActionResult Favorites()
+        public ActionResult Favorites(string jsonItem)
         {
-            return View();
+            Repository item = null;
+            if (jsonItem != null)
+            {
+                item = System.Web.Helpers.Json.Decode<Repository>(jsonItem);
+            }
+            List<Repository> repositoryList = (List<Repository>)Session["favorites"];
+            if (repositoryList == null)
+            {
+                repositoryList = new List<Repository>();
+                Session["favorites"] = repositoryList;
+            }
+            if (item != null && item.name != null)
+            {
+                repositoryList.Add(item);
+            }
+            return View("Favorites",repositoryList);
         }
 
-        public async Task<ActionResult> Gallery(string query)
+        [ChildActionOnly]
+        public ActionResult Gallery(List<Repository> repositoryList)
         {
-            List<Repository> result = await GithubAPI.GetRepositories(query);
-            return View(result);
+            return PartialView(repositoryList);
         }
     }
 }
