@@ -1,5 +1,5 @@
-﻿@model List<GithubExplorer.Models.Repository>
-@{ List<GithubExplorer.Models.Repository> favorites = (List<GithubExplorer.Models.Repository>)Session["favorites"];}
+﻿@model Dictionary<int, GithubExplorer.Models.Repository>
+@{ Dictionary<int, GithubExplorer.Models.Repository> favorites = (Dictionary<int, GithubExplorer.Models.Repository>)Session["favorites"]; }
 
 @if (Model.Count == 0)
 {
@@ -14,20 +14,31 @@
 <div class="row text-center">
     @if (Model.Count > 0 && Model != null)
     {
-        foreach (GithubExplorer.Models.Repository item in Model)
+        foreach (GithubExplorer.Models.Repository item in Model.Values)
         {
             <div class="col-12 col-sm-6 col-md-4 col-lg-3">
                 <div class="card mt-15">
                     <img src="@item.owner.avatar_url" class="card-img-top">
                     <p class="card-text d-inline">
-                        @item.name <br>
-                        by: @item.owner.login
+                        <a href="@item.html_url">@item.name</a><br>
+                        by: <a href="@item.owner.html_url">@item.owner.login</a>
                     </p>
-                    @Html.ActionLink("Add to Favorites",
-                   "Favorites",
-                   "Repository",
-                   new { jsonItem = Json.Encode(item) },
-                   new { @class = "btn btn-primary form-control mt-5" });
+                    @if (favorites == null || (favorites != null && !favorites.ContainsKey(item.id)))
+                    {
+                        @Html.ActionLink("Add to Favorites",
+        "Favorites",
+        "Repository",
+        new { jsonItem = Json.Encode(item), type="add" },
+        new { @class = "btn btn-primary form-control mt-5" })
+                    }
+                    @if (favorites != null && favorites.ContainsKey(item.id))
+                    {
+                        @Html.ActionLink("Remove from Favorites",
+        "Favorites",
+        "Repository",
+        new { jsonItem = Json.Encode(item), type="remove" },
+        new { @class = "btn btn-danger form-control mt-5" })
+                    }
                 </div>
             </div>
         }
